@@ -1,0 +1,12 @@
+{
+  "name": "quizlet-lite",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Console-paste helper panel for Quizlet Live",
+  "scripts": {
+    "test": "node test/test-quizlet-lite.js"
+  },
+  "devDependencies": {
+    "jsdom": "^26.0.0"
+  }
+}
