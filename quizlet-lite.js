@@ -194,6 +194,7 @@
         } catch (e) { errors.push(`set page ${e.message}`); }
         if (!pairs.length) throw new Error(`Couldn't read set ${id}${errors.length ? ` (${errors.join(", ")})` : ""}. If it's private, paste its word list instead.`);
         const n = addSet(id, title || `Set ${id}`, pairs, "link");
+        if (!n) return 0; // closed while loading
         status(`Loaded "${saved.sets[id].title}": ${n} terms`);
         return n;
     }
@@ -336,7 +337,7 @@
                 if (cur?.q === q) cur.green = true;
                 return;
             }
-            if (els.some((e) => isRed(rgb(e)))) { stats.wrong++; bad.add(badKey(q, name)); if (bucket()[q] === name) unlearn(q); cur = null; return; }
+            if (els.some((e) => isRed(rgb(e)))) { stats.wrong++; bad.add(badKey(q, name)); if (bucket()[q] === name) unlearn(q); if (cur?.q === q) cur = null; return; }
             if (Date.now() - t0 < 1500) setTimeout(tick, 50);
         };
         setTimeout(tick, 50);

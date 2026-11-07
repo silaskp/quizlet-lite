@@ -324,6 +324,17 @@ function boot({ store, fetch, url = "https://quizlet.com/live/ABC123", known = t
   ok(a1 == "424242" && a2 == "1000" && a3 == "424242", `follows the game's set A -> B -> A (${a1}, ${a2}, ${a3})`);
   t.w.close();
 
+  // Closed while a set is still loading: the late result is dropped, nothing saved, no error.
+  let release;
+  const late = { ok: true, json: async () => apiItems([["sero", "late"]]) };
+  t = boot({ fetch: (u) => !u.includes("studiable") ? { ok: false, status: 404 } : release ? late : new Promise((r) => (release = () => r(late))) }); // page 1 waits; later pages answer at once
+  t.tab("Sets").click(); { const i = t.card("Load Set").querySelector("input"); i.value = "313131"; t.enter(i); }
+  await sleep(20);
+  t.panel.querySelector("span").click(); t.panel.querySelector("span").click();
+  release(); await sleep(80);
+  ok(!t.panel.isConnected && !(t.saved().sets || {})["313131"], "a load that finishes after close saves nothing");
+  t.w.close();
+
   console.log(`\n${pass} passed, ${fail} failed`);
   process.exit(fail ? 1 : 0);
 })();
